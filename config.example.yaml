@@ -1,0 +1,107 @@
+# 复制本文件为 config.yaml 后填写：cp config.example.yaml config.yaml
+# 运行 `python -m src.boss.cli status` 检查配置是否合法。
+
+runtime:
+  profile_dir: "state/browser-profile"
+  headless: false          # 服务器配合 Xvfb；不要改成 true
+  xvfb_display: ":99"
+  slow_mo_ms: 120
+  page_timeout_ms: 30000
+  viewport:
+    width: 1440
+    height: 900
+  locale: "zh-CN"
+  timezone: "Asia/Shanghai"
+
+source:
+  # 运行 `python -m src.boss.cli capture-filters` 自动生成
+  search_url: ""
+  max_pages: 3
+
+rules:
+  # ===== 下面三组至少要填一组，否则启动会被拦截 =====
+
+  # 标题包含任意一个词才算匹配。写别名，别只写一个词。
+  title_any:
+    - "Java"
+    - "后端"
+    - "Golang"
+
+  # 薪资下限（K/月）。面议的职位会放行（避免误杀好岗位）
+  #
+  # ⚠ 限制：BOSS 用自定义字体把薪资数字渲染成私有区码点（反爬），
+  #   脚本读不出真实数值（三种破解方法都试过，均失败，见 VERIFICATION.md）。
+  #   所以这一项目前不可靠，处理方式见下面的 on_obfuscated_salary。
+  min_salary_k: 20
+
+  # 遇到"薪资读不出来"的职位怎么办：
+  #   passthrough  当面议放行（默认）—— 宁可多投，不误杀好岗位
+  #   skip         直接跳过 —— 适合你很在意薪资门槛时
+  #   warn_only    放行但在日报里标注
+  on_obfuscated_salary: "passthrough"
+
+  # 允许的城市，留空 = 不限
+  cities_allow:
+    - "深圳"
+
+  # 出现任意一词即跳过。这一项最重要，直接决定你会不会投进坑里。
+  exclude_keywords:
+    - "外包"
+    - "外派"
+    - "驻场"
+    - "劳务派遣"
+    - "培训贷"
+    - "无责底薪"
+    - "招转培"
+
+  # 公司名黑名单（子串匹配）
+  company_blacklist: []
+
+  # 强烈建议保持 true：投递过的职位永不重复
+  skip_if_applied_before: true
+
+  # 只在你确实不想设任何收紧条件时改为 true
+  allow_unfiltered: false
+
+schedule:
+  windows: ["09:30", "13:30", "20:00"]
+  per_window_cap: 8
+  daily_cap: 24
+  min_interval_sec: [20, 60]
+  page_interval_sec: [3, 8]
+
+safety:
+  # 前 3 天务必保持 true，确认筛选质量后再关闭
+  dry_run: true
+  stop_on_captcha: true
+  max_consecutive_failures: 3
+  job_action_timeout_sec: 25
+
+relogin:
+  enabled: true
+  channel: "email"
+  wait_timeout_sec: 600
+  poll_interval_sec: 5
+
+report:
+  output_dir: "reports"
+  keep_days: 30
+  notify:
+    email:
+      # 登录失效时靠它把二维码发给你，强烈建议配置
+      enabled: false
+      smtp_host: "smtp.qq.com"      # QQ 邮箱示例
+      smtp_port: 465
+      use_ssl: true
+      # 用户名和密码建议用环境变量 BOSS_MAIL_USER / BOSS_MAIL_PASS
+      username: ""
+      password: ""
+      from: ""
+      to:
+        - "you@example.com"
+    webhook:
+      enabled: false
+      url: ""                       # 建议用环境变量 BOSS_WEBHOOK_URL
+
+state:
+  db_path: "state/boss.db"

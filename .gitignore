@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 运行时产物
+# state/ 里存着登录 Cookie（等同账号凭据）和投递记录（丢了会重复投递），
+# 两者都绝不能入库
+state/
+reports/
+logs/
+
+# 敏感配置
+config.yaml
+secret.env
+.env
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/

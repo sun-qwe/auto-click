@@ -1,0 +1,17 @@
+[project]
+name = "boss-auto-apply"
+version = "0.1.0"
+description = "BOSS 直聘自动筛选与投递工具（保守、可审计、失败即停）"
+requires-python = ">=3.11"
+dependencies = [
+    "playwright>=1.44",
+    "PyYAML>=6.0",
+    "Jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
